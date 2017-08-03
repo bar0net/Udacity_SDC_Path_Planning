@@ -6,7 +6,37 @@ Implementation **for windows** by Jordi Tudela
 [Original Repository](https://github.com/udacity/CarND-Path-Planning-Project)
 
 ![Screenshot](/images/screen3.png)
-   
+
+## Model Documentation
+
+### Overview 
+The objective of this project is to develop a model that, given a comprensively parsed set of sensor data, it is capable of driving a car through a populated 3-lane highway without braking traffic regulation (ie speed limit) nor causing any major disconfort to its occupants (ie no large acceleration or jerk).
+
+* Follow lane
+* Prepare to change lane
+* Change lane
+
+### States:
+#### Follow Lane
+Follow lane is the main movement function and its goal is to mantain the car in its current lane at the maximum speed possible. That speed will tend toward the maximum speed allowed in the highway if there is no car directly in front of it but, if there is one, will adapt its speed to avoid a collision (the speed will be proportional to the gap between the cars with a maximum value equal to the velocity of the car in front).
+
+#### Prepare to change lane
+This state will trigger when there is a car in front. It will still be using the same movement function as Follow Lane as it was more convenient to code both movements in the same function (in both cases, the car must follow the current lane) but it will acctively look for a viable gap in the immediate side lanes.
+
+If it finds a lane qhere there are no cars close behing and there is enough free space in front, it will initiate a lane change.
+
+#### Change Lane
+The objective of this state is perfrom a change lane manouver. Still being bound by the velocity of the car in front of the original lane, it will start to lean towards the target lane. Note: if a car on the new lane comming from behing gets to close, the car will revert its manouver and get back to the original lane to avoid a possible collision.
+
+### Path Smoothing
+To avoid an excessive noisy path, I am using a weighted average between the previously computed path and the path computed at the current step using a ratio dependent on a cubic equation. This ratio has been manually tuned to give more importance to the previously computed path for points close to the car (less noise) and more importante to the new path for points far away from the car.
+
+### Additional Information
+Every implemented instruction has been thoroughly commented in the source code
+
+![Screenshot](/images/screen1.png)
+  
+## Other
 ### Simulator. You can download the Term3 Simulator BETA which contains the Path Planning Project from the [releases tab](https://github.com/udacity/self-driving-car-sim/releases).
 
 In this project your goal is to safely navigate around a virtual highway with other traffic that is driving +-10 MPH of the 50 MPH speed limit. You will be provided the car's localization and sensor fusion data, there is also a sparse map list of waypoints around the highway. The car should try to go as close as possible to the 50 MPH speed limit, which means passing slower traffic when possible, note that other cars will try to change lanes too. The car should avoid hitting other cars at all cost as well as driving inside of the marked road lanes at all times, unless going from one lane to another. The car should be able to make one complete loop around the 6946m highway. Since the car is trying to go 50 MPH, it should take a little over 5 minutes to complete 1 loop. Also the car should not experience total acceleration over 10 m/s^2 and jerk that is greater than 50 m/s^3.
